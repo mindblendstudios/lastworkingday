@@ -1,7 +1,6 @@
 import streamlit as st
 from datetime import datetime, timedelta
 import requests
-import holidays
 from io import BytesIO
 from fpdf import FPDF
 import smtplib
@@ -68,10 +67,10 @@ def generate_pdf(resignation_date, notice_period, last_working_day, country, cus
     pdf.cell(0, 10, f"Country: {country}", ln=True)
     pdf.cell(0, 10, f"Custom Holidays: {', '.join([d.strftime('%d-%m-%Y') for d in custom_holidays]) if custom_holidays else 'None'}", ln=True)
     pdf.cell(0, 10, f"Calculated Last Working Day: {last_working_day.strftime('%A, %d %B %Y')}", ln=True)
-    pdf_output = BytesIO()
-    pdf.output(pdf_output)
-    pdf_output.seek(0)
-    return pdf_output
+
+    # Fix: generate PDF as string and wrap in BytesIO
+    pdf_bytes = pdf.output(dest='S').encode('latin-1')
+    return BytesIO(pdf_bytes)
 
 def send_email(recipient_email, pdf_file, last_working_day):
     try:
