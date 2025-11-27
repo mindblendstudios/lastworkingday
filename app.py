@@ -34,7 +34,8 @@ def fetch_public_holidays(country_code, year):
         data = response.json()
         holidays_list = []
         for h in data.get("response", {}).get("holidays", []):
-            holidays_list.append(datetime.strptime(h["date"]["iso"], "%Y-%m-%d").date())
+            # Use fromisoformat to handle full ISO 8601 timestamp
+            holidays_list.append(datetime.fromisoformat(h["date"]["iso"]).date())
         return holidays_list
     except Exception as e:
         st.warning(f"Error fetching public holidays: {e}")
