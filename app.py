@@ -11,7 +11,7 @@ from email.mime.application import MIMEApplication
 # -----------------------------
 # Constants & Config
 # -----------------------------
-API_KEY = "hlDXO3CBqyYvoVOSPzsCI0Ryp10m5Qnq"
+API_KEY = st.secrets["calendarific"]["api_key"]  # Securely fetch API key
 HOLIDAY_API_URL = "https://calendarific.com/api/v2/holidays"
 
 # -----------------------------
@@ -68,7 +68,6 @@ def generate_pdf(resignation_date, notice_period, last_working_day, country, cus
     pdf.cell(0, 10, f"Custom Holidays: {', '.join([d.strftime('%d-%m-%Y') for d in custom_holidays]) if custom_holidays else 'None'}", ln=True)
     pdf.cell(0, 10, f"Calculated Last Working Day: {last_working_day.strftime('%A, %d %B %Y')}", ln=True)
 
-    # Fix: generate PDF as string and wrap in BytesIO
     pdf_bytes = pdf.output(dest='S').encode('latin-1')
     return BytesIO(pdf_bytes)
 
@@ -82,7 +81,6 @@ def send_email(recipient_email, pdf_file, last_working_day):
         message['Subject'] = f"Last Working Day Notification: {last_working_day.strftime('%d-%m-%Y')}"
         message.attach(MIMEText(f"Your calculated last working day is {last_working_day.strftime('%A, %d %B %Y')}. Please find the attached PDF.", "plain"))
 
-        # Attach PDF
         part = MIMEApplication(pdf_file.read(), Name="Last_Working_Day.pdf")
         part['Content-Disposition'] = 'attachment; filename="Last_Working_Day.pdf"'
         message.attach(part)
